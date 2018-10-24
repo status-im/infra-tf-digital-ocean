@@ -40,7 +40,9 @@ resource "digitalocean_droplet" "host" {
   # bootstraping access for later Ansible use
   provisioner "ansible" {
     plays {
-      playbook = "${path.cwd}/ansible/bootstrap.yml"
+      playbook = {
+        file_path = "${path.cwd}/ansible/bootstrap.yml"
+      }
       groups   = ["${var.group}"]
       extra_vars = {
         hostname         = "${var.name}-${format("%02d", count.index+1)}.${local.dc}.${var.env}.${local.stage}"
@@ -50,7 +52,6 @@ resource "digitalocean_droplet" "host" {
         env              = "${var.env}"
       }
     }
-    local = "yes"
   }
 }
 
