@@ -3,6 +3,10 @@ locals {
   stage  = "${terraform.workspace}"
   tokens = "${split(".", local.stage)}"
   dc     = "${var.provider}-${var.region}"
+  /* tags for the dropplet */
+  tags = ["${local.stage}", "${var.group}", "${var.env}"]
+  tags_sorted = "${sort(distinct(local.tags))}"
+  tags_count = "${length(local.tags_sorted)}"
   /* always add SSH, Tinc, Netdata, and Consul to allowed ports */
   open_ports = [
     "22", "655", "8000", "8301",
@@ -11,15 +15,9 @@ locals {
 }
 /* RESOURCES ------------------------------------*/
 
-resource "digitalocean_tag" "workspace" {
-  name  = "${element(local.tokens, count.index)}"
-  count = "${length(local.tokens)}"
-}
-resource "digitalocean_tag" "group" {
-  name  = "${var.group}"
-}
-resource "digitalocean_tag" "env" {
-  name  = "${var.env}"
+resource "digitalocean_tag" "host" {
+  name  = "${element(local.tags_sorted, count.index)}"
+  count = "${local.tags_count}"
 }
 
 /* Optional resource when vol_size is set */
@@ -39,11 +37,7 @@ resource "digitalocean_droplet" "host" {
   size   = "${var.size}"
   count  = "${var.count}"
 
-  tags   = [
-    "${digitalocean_tag.workspace.*.id}",
-    "${digitalocean_tag.group.id}",
-    "${digitalocean_tag.env.id}"
-  ]
+  tags   = [ "${digitalocean_tag.host.*.id}"]
   ssh_keys = "${var.ssh_keys}"
 
   /* This can be optional, ugly as hell but it works */
