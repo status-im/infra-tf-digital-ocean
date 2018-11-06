@@ -45,7 +45,12 @@ resource "digitalocean_droplet" "host" {
     "${compact(list(var.vol_size > 0 ? element(concat(digitalocean_volume.host.*.id, list("")), count.index) : ""))}"
   ]
 
-  # bootstraping access for later Ansible use
+  /* Ignore changes in attributes like image */
+  lifecycle {
+    ignore_changes = ["image"]
+  }
+
+  /* bootstraping access for later Ansible use */
   provisioner "ansible" {
     plays {
       playbook = {
