@@ -1,31 +1,25 @@
 # Description
 
-This is a helper module used by Status internal repos like:
-
-* https://github.com/status-im/infra-hq
-* https://github.com/status-im/infra-misc
-* https://github.com/status-im/infra-eth-cluster
-* https://github.com/status-im/infra-swarm
+This is a helper module used by Status internal repos like: [infra-hq](https://github.com/status-im/infra-hq), [infra-misc](https://github.com/status-im/infra-misc), [infra-eth-cluster](https://github.com/status-im/infra-eth-cluster), or [infra-swarm](https://github.com/status-im/infra-swarm).
 
 # Usage
 
 Simply import the modue using the `source` directive:
-```terraform
+```hcl
 module "digital-ocean" {
   source = "github.com/status-im/infra-tf-digital-ocean"
 }
 ```
 
-For more details see:
-https://www.terraform.io/docs/modules/sources.html#github
+[More details.](https://www.terraform.io/docs/modules/sources.html#github)
 
 # Variables
 
 * __Scaling__
+  * `count` - Number of hosts to start in this region.
   * `image` - OS image used to create host. (default: `ubuntu-18-04-x64`)
   * `size` - Type of host to create. (default: `s-1vcpu-1gb`)
   * `region` - Region in which the host will be created. (default: `ams3`)
-  * `count` - Number of hosts to start in this region.
   * `vol_size` - Size in GiB of an extra Volume to attach to the dropplet. (default: 0)
 * __General__
   * `name` - Prefix of hostname before index. (default: `node`)
