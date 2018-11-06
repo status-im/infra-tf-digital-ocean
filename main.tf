@@ -1,7 +1,3 @@
-/* PROVIDER -------------------------------------*/
-provider "digitalocean" {
-  version = "<= 1.0.0"
-}
 /* DERIVED --------------------------------------*/
 locals {
   stage  = "${terraform.workspace}"
