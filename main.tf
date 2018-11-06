@@ -60,11 +60,11 @@ resource "digitalocean_droplet" "host" {
  * https://stackoverflow.com/questions/47273733/how-do-i-build-a-list-of-maps-in-terraform
  **/
 resource "null_resource" "open_ports" {
-	count = "${length(local.open_ports)}"
-	triggers {
+  count = "${length(local.open_ports)}"
+  triggers {
     protocol   = "tcp"
-		port_range = "${element(local.open_ports, count.index)}"
-	}
+    port_range = "${element(local.open_ports, count.index)}"
+  }
 }
 
 resource "digitalocean_firewall" "host" {
