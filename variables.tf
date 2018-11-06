@@ -28,6 +28,11 @@ variable provider {
   default     = "do"
 }
 
+variable vol_size {
+  description = "Size in GiB of an extra Volume to attach to the dropplet."
+  default     = 0
+}
+
 /* GENERAL --------------------------------------*/
 
 variable name {

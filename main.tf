@@ -22,6 +22,15 @@ resource "digitalocean_tag" "env" {
   name  = "${var.env}"
 }
 
+/* Optional resource when vol_size is set */
+resource "digitalocean_volume" "host" {
+  name      = "data.${var.name}-${format("%02d", count.index+1)}.${local.dc}.${var.env}.${local.stage}"
+  region    = "${var.region}"
+  size      = "${var.vol_size}"
+  count     = "${var.vol_size > 0 ? var.count : 0}"
+  lifecycle = { prevent_destroy = true }
+}
+
 resource "digitalocean_droplet" "host" {
   name   = "${var.name}-${format("%02d", count.index+1)}.${local.dc}.${var.env}.${local.stage}"
 
@@ -36,6 +45,11 @@ resource "digitalocean_droplet" "host" {
     "${digitalocean_tag.env.id}"
   ]
   ssh_keys = "${var.ssh_keys}"
+
+  /* This can be optional, ugly as hell but it works */
+  volume_ids = [
+    "${compact(list(var.vol_size > 0 ? element(concat(digitalocean_volume.host.*.id, list("")), count.index) : ""))}"
+  ]
 
   # bootstraping access for later Ansible use
   provisioner "ansible" {
