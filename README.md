@@ -18,3 +18,21 @@ module "digital-ocean" {
 
 For more details see:
 https://www.terraform.io/docs/modules/sources.html#github
+
+# Variables
+
+* __Scaling__
+  * `image` - OS image used to create host. (default: `ubuntu-18-04-x64`)
+  * `size` - Type of host to create. (default: `s-1vcpu-1gb`)
+  * `region` - Region in which the host will be created. (default: `ams3`)
+  * `count` - Number of hosts to start in this region.
+  * `vol_size` - Size in GiB of an extra Volume to attach to the dropplet. (default: 0)
+* __General__
+  * `name` - Prefix of hostname before index. (default: `node`)
+  * `group` - Name of Ansible group to add hosts to.
+  * `env` - Environment for these hosts, affects DNS entries.
+  * `domain` - DNS Domain to update.
+* __Security__
+  * `ssh_user` - User used to log in to instance (default: `root`)
+  * `ssh_keys` - Names of ssh public keys to add to created hosts.
+  * `open_ports` - Port ranges to enable access from outside. Format: `N-N` (default: `[]`)
