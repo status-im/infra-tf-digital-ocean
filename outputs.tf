@@ -12,5 +12,5 @@ output "hostnames" {
 }
 
 output "hosts" {
-  value = ["${zipmap(local.hostnames, local.public_ips)}"]
+  value = "${zipmap(local.hostnames, local.public_ips)}"
 }
