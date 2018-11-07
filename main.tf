@@ -68,6 +68,13 @@ resource "digitalocean_droplet" "host" {
   }
 }
 
+resource "digitalocean_floating_ip" "host" {
+  droplet_id = "${element(digitalocean_droplet.host.*.id, count.index)}"
+  region     = "${element(digitalocean_droplet.host.*.region, count.index)}"
+  count      = "${var.count}"
+  lifecycle  = { prevent_destroy = true }
+}
+
 /**
  * This is a hack to generate a list of maps from a list
  * https://stackoverflow.com/questions/47273733/how-do-i-build-a-list-of-maps-in-terraform
@@ -90,7 +97,7 @@ resource "cloudflare_record" "host" {
   domain = "${var.domain}"
   count  = "${var.count}"
   name   = "${element(digitalocean_droplet.host.*.name, count.index)}"
-  value  = "${element(digitalocean_droplet.host.*.ipv4_address, count.index)}"
+  value  = "${element(digitalocean_floating_ip.host.*.ip_address, count.index)}"
   type   = "A"
   ttl    = 3600
 }
@@ -100,7 +107,7 @@ resource "ansible_host" "host" {
   groups = ["${var.group}", "${local.dc}"]
   count = "${var.count}"
   vars {
-    ansible_host = "${element(digitalocean_droplet.host.*.ipv4_address, count.index)}"
+    ansible_host = "${element(digitalocean_floating_ip.host.*.ip_address, count.index)}"
     hostname     = "${element(digitalocean_droplet.host.*.name, count.index)}"
     region       = "${element(digitalocean_droplet.host.*.region, count.index)}"
     dns_entry    = "${element(digitalocean_droplet.host.*.name, count.index)}.${var.domain}"

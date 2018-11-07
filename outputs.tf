@@ -1,5 +1,5 @@
 locals = {
-  public_ips = "${digitalocean_droplet.host.*.ipv4_address}"
+  public_ips = "${digitalocean_floating_ip.host.*.ip_address}"
   hostnames  = "${digitalocean_droplet.host.*.name}"
 }
 
