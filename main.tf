@@ -26,7 +26,10 @@ resource "digitalocean_volume" "host" {
   region    = "${var.region}"
   size      = "${var.vol_size}"
   count     = "${var.vol_size > 0 ? var.count : 0}"
-  lifecycle = { prevent_destroy = true }
+  lifecycle = {
+    prevent_destroy = true }
+    ignore_changes = ["name"]
+  }
 }
 
 resource "digitalocean_droplet" "host" {
