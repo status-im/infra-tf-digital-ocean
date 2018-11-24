@@ -27,7 +27,8 @@ resource "digitalocean_volume" "host" {
   size      = "${var.vol_size}"
   count     = "${var.vol_size > 0 ? var.count : 0}"
   lifecycle = {
-    prevent_destroy = true }
+    prevent_destroy = true
+    /* We do this to avoid destrying a volume unnecesarily */
     ignore_changes = ["name"]
   }
 }
