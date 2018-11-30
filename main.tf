@@ -113,7 +113,6 @@ resource "cloudflare_record" "hosts" {
   value  = "${element(digitalocean_floating_ip.host.*.ip_address, count.index)}"
   count  = "${var.count}"
   type   = "A"
-  ttl    = 3600
 }
 
 resource "ansible_host" "host" {
