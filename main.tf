@@ -115,7 +115,8 @@ resource "ansible_host" "host" {
   inventory_hostname = "${element(digitalocean_droplet.host.*.name, count.index)}"
   groups = ["${var.group}", "${local.dc}"]
   count = "${var.host_count}"
-  vars {
+
+  vars = {
     ansible_host = "${element(digitalocean_floating_ip.host.*.ip_address, count.index)}"
     hostname     = "${element(digitalocean_droplet.host.*.name, count.index)}"
     region       = "${element(digitalocean_droplet.host.*.region, count.index)}"
