@@ -25,7 +25,7 @@ resource "digitalocean_volume" "host" {
   name      = "data.${var.name}-${format("%02d", count.index+1)}.${local.dc}.${var.env}.${local.stage}"
   region    = "${var.region}"
   size      = "${var.vol_size}"
-  count     = "${var.vol_size > 0 ? var.count : 0}"
+  count     = "${var.vol_size > 0 ? var.host_count : 0}"
   lifecycle = {
     prevent_destroy = true
     /* We do this to avoid destrying a volume unnecesarily */
@@ -39,7 +39,7 @@ resource "digitalocean_droplet" "host" {
   image  = "${var.image}"
   region = "${var.region}"
   size   = "${var.size}"
-  count  = "${var.count}"
+  count  = "${var.host_count}"
 
   tags   = [ "${digitalocean_tag.host.*.id}"]
   ssh_keys = "${var.ssh_keys}"
@@ -75,7 +75,7 @@ resource "digitalocean_droplet" "host" {
 resource "digitalocean_floating_ip" "host" {
   droplet_id = "${element(digitalocean_droplet.host.*.id, count.index)}"
   region     = "${element(digitalocean_droplet.host.*.region, count.index)}"
-  count      = "${var.count}"
+  count      = "${var.host_count}"
   lifecycle  = { prevent_destroy = true }
 }
 
@@ -99,7 +99,7 @@ resource "digitalocean_firewall" "host" {
 
 resource "cloudflare_record" "host" {
   domain = "${var.domain}"
-  count  = "${var.count}"
+  count  = "${var.host_count}"
   name   = "${element(digitalocean_droplet.host.*.name, count.index)}"
   value  = "${element(digitalocean_floating_ip.host.*.ip_address, count.index)}"
   type   = "A"
@@ -111,14 +111,14 @@ resource "cloudflare_record" "hosts" {
   domain = "${var.domain}"
   name   = "${var.name}s.${local.dc}.${var.env}.${local.stage}"
   value  = "${element(digitalocean_floating_ip.host.*.ip_address, count.index)}"
-  count  = "${var.count}"
+  count  = "${var.host_count}"
   type   = "A"
 }
 
 resource "ansible_host" "host" {
   inventory_hostname = "${element(digitalocean_droplet.host.*.name, count.index)}"
   groups = ["${var.group}", "${local.dc}"]
-  count = "${var.count}"
+  count = "${var.host_count}"
   vars {
     ansible_host = "${element(digitalocean_floating_ip.host.*.ip_address, count.index)}"
     hostname     = "${element(digitalocean_droplet.host.*.name, count.index)}"

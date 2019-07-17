@@ -18,7 +18,7 @@ variable region {
   default     = "ams3"
 }
 
-variable count {
+variable host_count {
   description = "Number of hosts to start in this region."
 }
 
