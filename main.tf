@@ -26,7 +26,7 @@ resource "digitalocean_volume" "host" {
   region    = "${var.region}"
   size      = "${var.vol_size}"
   count     = "${var.vol_size > 0 ? var.host_count : 0}"
-  lifecycle = {
+  lifecycle {
     prevent_destroy = true
     /* We do this to avoid destrying a volume unnecesarily */
     ignore_changes = ["name"]
@@ -76,7 +76,9 @@ resource "digitalocean_floating_ip" "host" {
   droplet_id = "${element(digitalocean_droplet.host.*.id, count.index)}"
   region     = "${element(digitalocean_droplet.host.*.region, count.index)}"
   count      = "${var.host_count}"
-  lifecycle  = { prevent_destroy = true }
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 /**
