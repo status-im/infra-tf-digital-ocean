@@ -45,7 +45,7 @@ resource "digitalocean_droplet" "host" {
   ssh_keys = "${var.ssh_keys}"
 
   /* This can be optional, ugly as hell but it works */
-  volume_ids = digitalocean_volume.host[*].id
+  volume_ids = var.vol_size > 0 ? [digitalocean_volume.host[count.index].id] : []
 
   /* Ignore changes in attributes like image */
   lifecycle {
