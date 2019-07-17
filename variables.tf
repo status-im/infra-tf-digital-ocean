@@ -59,7 +59,7 @@ variable ssh_user {
 
 variable ssh_keys {
   description = "Names of ssh public keys to add to created hosts"
-  type        = "list"
+  type        = list(string)
   # cmd: doctl compute ssh-key list
   default     = ["16822693", "18813432", "18813461", "19525749", "20671731", "20686611"]
 }
@@ -68,6 +68,6 @@ variable ssh_keys {
 
 variable open_ports {
   description = "Port ranges to enable access from outside. Format: 'N-N'"
-  type        = "list"
+  type        = list(string)
   default     = []
 }
