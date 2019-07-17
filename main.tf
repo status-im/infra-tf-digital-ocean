@@ -8,10 +8,7 @@ locals {
   tags_sorted = "${sort(distinct(local.tags))}"
   tags_count  = "${length(local.tags_sorted)}"
   /* always add SSH, Tinc, Netdata, and Consul to allowed ports */
-  open_ports  = [
-    "22", "655", "8000", "8301",
-    "${var.open_ports}"
-  ]
+  open_ports  = concat(["22", "655", "8000", "8301"], var.open_ports)
 }
 /* RESOURCES ------------------------------------*/
 
