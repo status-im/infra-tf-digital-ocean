@@ -45,9 +45,7 @@ resource "digitalocean_droplet" "host" {
   ssh_keys = "${var.ssh_keys}"
 
   /* This can be optional, ugly as hell but it works */
-  volume_ids = [
-    "${compact(list(var.vol_size > 0 ? element(concat(digitalocean_volume.host.*.id, list("")), count.index) : ""))}"
-  ]
+  volume_ids = [digitalocean_volume.host[*].id]
 
   /* Ignore changes in attributes like image */
   lifecycle {
