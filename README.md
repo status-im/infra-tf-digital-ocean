@@ -16,7 +16,7 @@ module "digital-ocean" {
 # Variables
 
 * __Scaling__
-  * `count` - Number of hosts to start in this region.
+  * `host_count` - Number of hosts to start in this region.
   * `image` - OS image used to create host. (default: `ubuntu-18-04-x64`)
   * `size` - Type of host to create. (default: `s-1vcpu-1gb`)
   * `region` - Region in which the host will be created. (default: `ams3`)
