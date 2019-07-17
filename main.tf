@@ -2,7 +2,7 @@
 locals {
   stage  = "${terraform.workspace}"
   tokens = "${split(".", local.stage)}"
-  dc     = "${var.provider}-${var.region}"
+  dc     = "${var.provider_name}-${var.region}"
   /* tags for the dropplet */
   tags = ["${local.stage}", "${var.group}", "${var.env}"]
   tags_sorted = "${sort(distinct(local.tags))}"

@@ -22,7 +22,7 @@ variable host_count {
   description = "Number of hosts to start in this region."
 }
 
-variable provider {
+variable provider_name {
   description = "Short name of provider being used."
   # Digital Ocean
   default     = "do"
