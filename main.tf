@@ -1,14 +1,14 @@
 /* DERIVED --------------------------------------*/
 locals {
-  stage  = "${terraform.workspace}"
-  tokens = "${split(".", local.stage)}"
-  dc     = "${var.provider_name}-${var.region}"
+  stage       = "${terraform.workspace}"
+  tokens      = "${split(".", local.stage)}"
+  dc          = "${var.provider_name}-${var.region}"
   /* tags for the dropplet */
-  tags = ["${local.stage}", "${var.group}", "${var.env}"]
+  tags        = ["${local.stage}", "${var.group}", "${var.env}"]
   tags_sorted = "${sort(distinct(local.tags))}"
-  tags_count = "${length(local.tags_sorted)}"
+  tags_count  = "${length(local.tags_sorted)}"
   /* always add SSH, Tinc, Netdata, and Consul to allowed ports */
-  open_ports = [
+  open_ports  = [
     "22", "655", "8000", "8301",
     "${var.open_ports}"
   ]
@@ -41,11 +41,11 @@ resource "digitalocean_droplet" "host" {
   size   = "${var.size}"
   count  = "${var.host_count}"
 
-  tags   = [ "${digitalocean_tag.host.*.id}"]
+  tags   = digitalocean_tag.host[*].id
   ssh_keys = "${var.ssh_keys}"
 
   /* This can be optional, ugly as hell but it works */
-  volume_ids = [digitalocean_volume.host[*].id]
+  volume_ids = digitalocean_volume.host[*].id
 
   /* Ignore changes in attributes like image */
   lifecycle {
@@ -82,7 +82,7 @@ resource "digitalocean_floating_ip" "host" {
 
 resource "digitalocean_firewall" "host" {
   name        = "${var.name}.${local.dc}.${var.env}.${local.stage}"
-  droplet_ids = ["${digitalocean_droplet.host.*.id}"]
+  droplet_ids = digitalocean_droplet.host[*].id
   dynamic "inbound_rule" {
     iterator = port
     for_each = local.open_ports
