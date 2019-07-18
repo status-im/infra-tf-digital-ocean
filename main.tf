@@ -57,7 +57,7 @@ resource "digitalocean_droplet" "host" {
       groups = [var.group]
 
       extra_vars = {
-        hostname         = "${var.name}-${format("%02d", count.index+1)}.${local.dc}.${var.env}.${local.stage}"
+        hostname         = self.name
         ansible_ssh_user = var.ssh_user
         data_center      = local.dc
         stage            = local.stage
