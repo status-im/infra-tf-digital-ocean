@@ -1,8 +1,8 @@
 /* DERIVED --------------------------------------*/
 locals {
-  stage       = terraform.workspace
-  tokens      = split(".", local.stage)
-  dc          = "${var.provider_name}-${var.region}"
+  stage = terraform.workspace
+  dc    = "${var.provider_name}-${var.region}"
+  sufix = "${local.dc}.${var.env}.${local.stage}"
   /* tags for the dropplet */
   tags        = [local.stage, var.group, var.env]
   tags_sorted = sort(distinct(local.tags))
@@ -18,7 +18,7 @@ resource "digitalocean_tag" "host" {
 
 /* Optional resource when vol_size is set */
 resource "digitalocean_volume" "host" {
-  name      = "data.${var.name}-${format("%02d", count.index+1)}.${local.dc}.${var.env}.${local.stage}"
+  name      = "data.${var.name}-${format("%02d", count.index+1)}.${local.sufix}"
   region    = var.region
   size      = var.vol_size
   count     = var.vol_size > 0 ? var.host_count : 0
@@ -30,7 +30,7 @@ resource "digitalocean_volume" "host" {
 }
 
 resource "digitalocean_droplet" "host" {
-  name   = "${var.name}-${format("%02d", count.index+1)}.${local.dc}.${var.env}.${local.stage}"
+  name   = "${var.name}-${format("%02d", count.index+1)}.${local.sufix}"
 
   image    = var.image
   region   = var.region
@@ -77,7 +77,7 @@ resource "digitalocean_floating_ip" "host" {
 }
 
 resource "digitalocean_firewall" "host" {
-  name        = "${var.name}.${local.dc}.${var.env}.${local.stage}"
+  name        = "${var.name}.${local.sufix}"
   droplet_ids = digitalocean_droplet.host[*].id
   dynamic "inbound_rule" {
     iterator = port
@@ -101,7 +101,7 @@ resource "cloudflare_record" "host" {
 /* combined dns entry for groups of hosts, example: nodes.do-ams3.thing.misc.statusim.net */
 resource "cloudflare_record" "hosts" {
   domain = var.domain
-  name   = "${var.name}s.${local.dc}.${var.env}.${local.stage}"
+  name   = "${var.name}s.${local.sufix}"
   value  = digitalocean_floating_ip.host[count.index].ip_address
   count  = var.host_count
   type   = "A"
