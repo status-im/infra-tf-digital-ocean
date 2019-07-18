@@ -6,7 +6,6 @@ locals {
   /* tags for the dropplet */
   tags        = [local.stage, var.group, var.env]
   tags_sorted = sort(distinct(local.tags))
-  tags_count  = length(local.tags_sorted)
   /* always add SSH, Tinc, Netdata, and Consul to allowed ports */
   open_ports  = concat(["22", "655", "8000", "8301"], var.open_ports)
 }
@@ -14,7 +13,7 @@ locals {
 
 resource "digitalocean_tag" "host" {
   name  = local.tags_sorted[count.index]
-  count = local.tags_count
+  count = length(local.tags_sorted)
 }
 
 /* Optional resource when vol_size is set */
