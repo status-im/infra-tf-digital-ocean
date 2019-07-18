@@ -41,7 +41,7 @@ resource "digitalocean_droplet" "host" {
   tags   = digitalocean_tag.host[*].id
 
   /* This can be optional, ugly as hell but it works */
-  volume_ids = var.vol_size > 0 ? [digitalocean_volume.host[count.index].id] : []
+  volume_ids = var.vol_size > 0 ? [digitalocean_volume.host[count.index].id] : null
 
   /* Ignore changes in attributes like image */
   lifecycle {
