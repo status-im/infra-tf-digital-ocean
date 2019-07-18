@@ -13,7 +13,7 @@ locals {
 /* RESOURCES ------------------------------------*/
 
 resource "digitalocean_tag" "host" {
-  name  = element(local.tags_sorted, count.index)
+  name  = local.tags_sorted[count.index]
   count = local.tags_count
 }
 
@@ -69,8 +69,8 @@ resource "digitalocean_droplet" "host" {
 }
 
 resource "digitalocean_floating_ip" "host" {
-  droplet_id = element(digitalocean_droplet.host.*.id, count.index)
-  region     = element(digitalocean_droplet.host.*.region, count.index)
+  droplet_id = digitalocean_droplet.host[count.index].id
+  region     = digitalocean_droplet.host[count.index].region
   count      = var.host_count
   lifecycle {
     prevent_destroy = true
@@ -93,8 +93,8 @@ resource "digitalocean_firewall" "host" {
 resource "cloudflare_record" "host" {
   domain = var.domain
   count  = var.host_count
-  name   = element(digitalocean_droplet.host.*.name, count.index)
-  value  = element(digitalocean_floating_ip.host.*.ip_address, count.index)
+  name   = digitalocean_droplet.host[count.index].name
+  value  = digitalocean_floating_ip.host[count.index].ip_address
   type   = "A"
   ttl    = 3600
 }
@@ -103,22 +103,22 @@ resource "cloudflare_record" "host" {
 resource "cloudflare_record" "hosts" {
   domain = var.domain
   name   = "${var.name}s.${local.dc}.${var.env}.${local.stage}"
-  value  = element(digitalocean_floating_ip.host.*.ip_address, count.index)
+  value  = digitalocean_floating_ip.host[count.index].ip_address
   count  = var.host_count
   type   = "A"
 }
 
 resource "ansible_host" "host" {
-  inventory_hostname = element(digitalocean_droplet.host.*.name, count.index)
+  inventory_hostname = digitalocean_droplet.host[count.index].name
 
   groups = [var.group, local.dc]
   count  = var.host_count
 
   vars = {
-    ansible_host = element(digitalocean_floating_ip.host.*.ip_address, count.index)
-    hostname     = element(digitalocean_droplet.host.*.name, count.index)
-    region       = element(digitalocean_droplet.host.*.region, count.index)
-    dns_entry    = "${element(digitalocean_droplet.host.*.name, count.index)}.${var.domain}"
+    ansible_host = digitalocean_floating_ip.host[count.index].ip_address
+    hostname     = digitalocean_droplet.host[count.index].name
+    region       = digitalocean_droplet.host[count.index].region
+    dns_entry    = "${digitalocean_droplet.host[count.index].name}.${var.domain}"
     dns_domain   = var.domain
     data_center  = local.dc
     stage        = local.stage
