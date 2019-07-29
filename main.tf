@@ -98,15 +98,6 @@ resource "cloudflare_record" "host" {
   ttl    = 3600
 }
 
-/* combined dns entry for groups of hosts, example: nodes.do-ams3.thing.misc.statusim.net */
-resource "cloudflare_record" "hosts" {
-  domain = var.domain
-  name   = "${var.name}s.${local.sufix}"
-  value  = digitalocean_floating_ip.host[count.index].ip_address
-  count  = var.host_count
-  type   = "A"
-}
-
 resource "ansible_host" "host" {
   inventory_hostname = digitalocean_droplet.host[count.index].name
 
