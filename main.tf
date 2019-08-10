@@ -54,6 +54,8 @@ resource "digitalocean_droplet" "host" {
       playbook {
         file_path = "${path.cwd}/ansible/bootstrap.yml"
       }
+
+      hosts  = [self.ip_address]
       groups = [var.group]
 
       extra_vars = {
