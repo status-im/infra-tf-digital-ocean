@@ -55,7 +55,7 @@ resource "digitalocean_droplet" "host" {
         file_path = "${path.cwd}/ansible/bootstrap.yml"
       }
 
-      hosts  = [self.ip_address]
+      hosts  = [self.ipv4_address]
       groups = [var.group]
 
       extra_vars = {
@@ -95,7 +95,7 @@ resource "cloudflare_record" "host" {
   domain = var.domain
   count  = var.host_count
   name   = digitalocean_droplet.host[count.index].name
-  value  = digitalocean_floating_ip.host[count.index].ip_address
+  value  = digitalocean_floating_ip.host[count.index].ipv4_address
   type   = "A"
   ttl    = 3600
 }
@@ -107,7 +107,7 @@ resource "ansible_host" "host" {
   count  = var.host_count
 
   vars = {
-    ansible_host = digitalocean_floating_ip.host[count.index].ip_address
+    ansible_host = digitalocean_floating_ip.host[count.index].ipv4_address
     hostname     = digitalocean_droplet.host[count.index].name
     region       = digitalocean_droplet.host[count.index].region
     dns_entry    = "${digitalocean_droplet.host[count.index].name}.${var.domain}"
