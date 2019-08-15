@@ -95,7 +95,7 @@ resource "cloudflare_record" "host" {
   domain = var.domain
   count  = var.host_count
   name   = digitalocean_droplet.host[count.index].name
-  value  = digitalocean_floating_ip.host[count.index].ipv4_address
+  value  = digitalocean_floating_ip.host[count.index].ip_address
   type   = "A"
   ttl    = 3600
 }
@@ -107,7 +107,7 @@ resource "ansible_host" "host" {
   count  = var.host_count
 
   vars = {
-    ansible_host = digitalocean_floating_ip.host[count.index].ipv4_address
+    ansible_host = digitalocean_floating_ip.host[count.index].ip_address
     hostname     = digitalocean_droplet.host[count.index].name
     region       = digitalocean_droplet.host[count.index].region
     dns_entry    = "${digitalocean_droplet.host[count.index].name}.${var.domain}"
