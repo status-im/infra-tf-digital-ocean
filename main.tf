@@ -25,7 +25,7 @@ resource "digitalocean_volume" "host" {
   lifecycle {
     prevent_destroy = true
     /* We do this to avoid destrying a volume unnecesarily */
-    ignore_changes = ["name"]
+    ignore_changes = [ name ]
   }
 }
 
@@ -45,7 +45,7 @@ resource "digitalocean_droplet" "host" {
 
   /* Ignore changes in attributes like image */
   lifecycle {
-    ignore_changes = ["image"]
+    ignore_changes = [ image ]
   }
 
   /* bootstraping access for later Ansible use */
