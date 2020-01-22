@@ -81,6 +81,13 @@ resource "digitalocean_floating_ip" "host" {
 resource "digitalocean_firewall" "host" {
   name        = "${var.name}.${local.sufix}"
   droplet_ids = digitalocean_droplet.host[*].id
+
+  /* Allow ICMP pings */
+  inbound_rule {
+    protocol         = "icmp"
+    source_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
   dynamic "inbound_rule" {
     iterator = port
     for_each = local.open_ports
