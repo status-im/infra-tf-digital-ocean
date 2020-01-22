@@ -104,7 +104,7 @@ resource "digitalocean_firewall" "host" {
     for_each = ["tcp", "udp"]
     content {
       protocol              = protocol.value
-      port_range            = "1-65535"
+      port_range            = "all"
       destination_addresses = ["0.0.0.0/0", "::/0"]
     }
   }
