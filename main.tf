@@ -85,8 +85,9 @@ resource "digitalocean_firewall" "host" {
     iterator = port
     for_each = local.open_ports
     content {
-      protocol   = "tcp"
-      port_range = port.value
+      protocol         = "tcp"
+      port_range       = port.value
+      source_addresses = ["0.0.0.0/0", "::/0"]
     }
   }
 }
