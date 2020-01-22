@@ -90,6 +90,17 @@ resource "digitalocean_firewall" "host" {
       source_addresses = ["0.0.0.0/0", "::/0"]
     }
   }
+  
+  /* Open for all outgoing connections */
+  dynamic "outbound_rule" {
+    iterator = protocol
+    for_each = ["tcp", "udp"]
+    content {
+      protocol              = protocol.value
+      port_range            = "1-65535"
+      destination_addresses = ["0.0.0.0/0", "::/0"]
+    }
+  }
 }
 
 resource "cloudflare_record" "host" {
