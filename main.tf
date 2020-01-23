@@ -87,6 +87,10 @@ resource "digitalocean_firewall" "host" {
     protocol         = "icmp"
     source_addresses = ["0.0.0.0/0", "::/0"]
   }
+  outbound_rule {
+    protocol              = "icmp"
+    destination_addresses = ["0.0.0.0/0", "::/0"]
+  }
 
   dynamic "inbound_rule" {
     iterator = port
