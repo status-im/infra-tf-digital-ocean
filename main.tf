@@ -92,11 +92,23 @@ resource "digitalocean_firewall" "host" {
     destination_addresses = ["0.0.0.0/0", "::/0"]
   }
 
+  /* TCP */
   dynamic "inbound_rule" {
     iterator = port
     for_each = local.open_ports
     content {
       protocol         = "tcp"
+      port_range       = port.value
+      source_addresses = ["0.0.0.0/0", "::/0"]
+    }
+  }
+
+  /* UDP */
+  dynamic "inbound_rule" {
+    iterator = port
+    for_each = local.open_ports
+    content {
+      protocol         = "udp"
       port_range       = port.value
       source_addresses = ["0.0.0.0/0", "::/0"]
     }
