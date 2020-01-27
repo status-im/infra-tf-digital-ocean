@@ -7,7 +7,8 @@ locals {
   tags        = [local.stage, var.group, var.env]
   tags_sorted = sort(distinct(local.tags))
   /* always add SSH, Tinc, Netdata, and Consul to allowed ports */
-  open_ports  = concat(["22", "655", "8000", "8301"], var.open_ports)
+  open_tcp_ports  = concat(["22", "655", "8000", "8301"], var.open_tcp_ports)
+  open_udp_ports  = concat(["8301"], var.open_udp_ports)
 }
 /* RESOURCES ------------------------------------*/
 
@@ -95,7 +96,7 @@ resource "digitalocean_firewall" "host" {
   /* TCP */
   dynamic "inbound_rule" {
     iterator = port
-    for_each = local.open_ports
+    for_each = local.open_tcp_ports
     content {
       protocol         = "tcp"
       port_range       = port.value
@@ -106,7 +107,7 @@ resource "digitalocean_firewall" "host" {
   /* UDP */
   dynamic "inbound_rule" {
     iterator = port
-    for_each = local.open_ports
+    for_each = local.open_udp_ports
     content {
       protocol         = "udp"
       port_range       = port.value

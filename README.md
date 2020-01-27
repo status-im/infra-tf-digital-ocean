@@ -29,4 +29,5 @@ module "digital-ocean" {
 * __Security__
   * `ssh_user` - User used to log in to instance (default: `root`)
   * `ssh_keys` - Names of ssh public keys to add to created hosts.
-  * `open_ports` - Port ranges to enable access from outside. Format: `N-N` (default: `[]`)
+  * `open_tcp_ports` - TCP port ranges to enable access from outside. Format: `N-N` (default: `[]`)
+  * `open_udp_ports` - UDP port ranges to enable access from outside. Format: `N-N` (default: `[]`)

@@ -1,6 +1,6 @@
 /* DNS ------------------------------------------*/
 
-variable "cf_zone_id" {
+variable cf_zone_id {
   description = "ID of CloudFlare zone for host record."
   /* We default to: statusim.net */
   default     = "14660d10344c9898521c4ba49789f563"
@@ -74,8 +74,14 @@ variable ssh_keys {
 
 /* FIREWALL -------------------------------------------*/
 
-variable open_ports {
-  description = "Port ranges to enable access from outside. Format: 'N-N'"
+variable open_tcp_ports {
+  description = "TCP port ranges to enable access from outside. Format: 'N-N'"
+  type        = list(string)
+  default     = []
+}
+
+variable open_udp_ports {
+  description = "UDP port ranges to enable access from outside. Format: 'N-N'"
   type        = list(string)
   default     = []
 }
