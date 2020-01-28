@@ -2,6 +2,7 @@
 
 variable cf_zone_id {
   description = "ID of CloudFlare zone for host record."
+  type        = string
   /* We default to: statusim.net */
   default     = "14660d10344c9898521c4ba49789f563"
 }
@@ -10,34 +11,41 @@ variable cf_zone_id {
 
 variable image {
   description = "OS image used to create host."
+  type        = string
   # cmd: doctl compute image list --public
   default     = "ubuntu-18-04-x64"
 }
 
 variable size {
   description = "Type of host to create."
+  type        = string
   # cmd: doctl compute size list
   default     = "s-1vcpu-1gb"
 }
 
 variable region {
   description = "Region in which the host will be created."
+  type        = string
   # cmd: doctl compute region list
   default     = "ams3"
 }
 
 variable host_count {
   description = "Number of hosts to start in this region."
+  type        = number
+  default     = 1
 }
 
 variable provider_name {
   description = "Short name of provider being used."
+  type        = string
   # Digital Ocean
   default     = "do"
 }
 
 variable vol_size {
   description = "Size in GiB of an extra Volume to attach to the dropplet."
+  type        = number
   default     = 0
 }
 
@@ -45,23 +53,28 @@ variable vol_size {
 
 variable name {
   description = "Prefix of hostname before index."
+  type        = string
   default     = "node"
 }
 
 variable group {
   description = "Name of Ansible group to add hosts to."
+  type        = string
 }
 
 variable env {
   description = "Environment for these hosts, affects DNS entries."
+  type        = string
 }
 
 variable domain {
   description = "DNS Domain to update"
+  type        = string
 }
 
 variable ssh_user {
   description = "User used to log in to instance"
+  type        = string
   default     = "root"
 }
 
