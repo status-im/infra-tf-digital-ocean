@@ -19,7 +19,7 @@ resource "digitalocean_tag" "host" {
 
 /* Optional resource when vol_size is set */
 resource "digitalocean_volume" "host" {
-  name      = "data.${var.name}-${format("%02d", count.index+1)}.${local.sufix}"
+  name      = "data-${replace(var.name, ".", "-")}-${format("%02d", count.index+1)}-${replace(local.sufix, ".", "-")}"
   region    = var.region
   size      = var.vol_size
   count     = var.vol_size > 0 ? var.host_count : 0
