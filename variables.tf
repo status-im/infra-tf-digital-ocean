@@ -13,7 +13,7 @@ variable image {
   description = "OS image used to create host."
   type        = string
   # cmd: doctl compute image list --public
-  default     = "ubuntu-18-04-x64"
+  default     = "ubuntu-20-04-x64"
 }
 
 variable size {
