@@ -43,8 +43,8 @@ variable provider_name {
   default     = "do"
 }
 
-variable vol_size {
-  description = "Size in GiB of an extra Volume to attach to the dropplet."
+variable data_vol_size {
+  description = "Size in GiB of an extra data volume to attach to the dropplet."
   type        = number
   default     = 0
 }

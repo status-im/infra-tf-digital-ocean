@@ -20,7 +20,7 @@ module "digital-ocean" {
   * `image` - OS image used to create host. (default: `ubuntu-18-04-x64`)
   * `size` - Type of host to create. (default: `s-1vcpu-1gb`)
   * `region` - Region in which the host will be created. (default: `ams3`)
-  * `vol_size` - Size in GiB of an extra Volume to attach to the dropplet. (default: 0)
+  * `data_vol_size` - Size in GiB of an extra data volume to attach to the dropplet. (default: 0)
 * __General__
   * `name` - Prefix of hostname before index. (default: `node`)
   * `group` - Name of Ansible group to add hosts to.

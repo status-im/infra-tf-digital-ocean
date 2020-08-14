@@ -21,8 +21,8 @@ resource "digitalocean_tag" "host" {
 resource "digitalocean_volume" "host" {
   name      = "data-${replace(var.name, ".", "-")}-${format("%02d", count.index+1)}-${replace(local.sufix, ".", "-")}"
   region    = var.region
-  size      = var.vol_size
-  count     = var.vol_size > 0 ? var.host_count : 0
+  size      = var.data_vol_size
+  count     = var.data_vol_size > 0 ? var.host_count : 0
   lifecycle {
     prevent_destroy = true
     /* We do this to avoid destrying a volume unnecesarily */
@@ -42,7 +42,7 @@ resource "digitalocean_droplet" "host" {
   tags   = digitalocean_tag.host[*].id
 
   /* This can be optional, ugly as hell but it works */
-  volume_ids = var.vol_size > 0 ? [digitalocean_volume.host[count.index].id] : null
+  volume_ids = var.data_vol_size > 0 ? [digitalocean_volume.host[count.index].id] : null
 
   /* Ignore changes in attributes like image */
   lifecycle {
