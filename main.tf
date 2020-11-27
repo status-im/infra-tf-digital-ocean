@@ -1,6 +1,6 @@
 /* DERIVED --------------------------------------*/
 locals {
-  stage = terraform.workspace
+  stage = var.stage != "" ? var.stage : terraform.workspace
   dc    = "${var.provider_name}-${var.region}"
   sufix = "${local.dc}.${var.env}.${local.stage}"
   /* tags for the dropplet */

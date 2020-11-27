@@ -67,6 +67,12 @@ variable env {
   type        = string
 }
 
+variable "stage" {
+  description = "Name of stage, like prod, dev, or staging."
+  type        = string
+  default     = ""
+}
+
 variable domain {
   description = "DNS Domain to update"
   type        = string
