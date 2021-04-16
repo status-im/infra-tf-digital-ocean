@@ -88,7 +88,10 @@ variable ssh_keys {
   description = "Names of ssh public keys to add to created hosts"
   type        = list(string)
   # cmd: doctl compute ssh-key list
-  default     = ["16822693", "18813432", "18813461", "19525749", "20671731", "20686611"]
+  default     = [
+    "20671731", # jakubgs
+    "30058112", # arthurk
+  ]
 }
 
 /* FIREWALL -------------------------------------------*/
