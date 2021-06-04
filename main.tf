@@ -139,7 +139,7 @@ resource "cloudflare_record" "host" {
 resource "ansible_host" "host" {
   inventory_hostname = digitalocean_droplet.host[count.index].name
 
-  groups = [var.group, local.dc]
+  groups = ["${var.env}.${local.stage}", var.group, local.dc]
   count  = var.host_count
 
   vars = {
