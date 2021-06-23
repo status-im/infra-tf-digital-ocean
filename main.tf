@@ -7,8 +7,8 @@ locals {
   tags        = [local.stage, var.group, var.env]
   tags_sorted = sort(distinct(local.tags))
   /* always add SSH, Tinc, Netdata, and Consul to allowed ports */
-  open_tcp_ports  = concat(["22", "655", "8000", "8301"], var.open_tcp_ports)
-  open_udp_ports  = concat(["51820", "655", "8301"], var.open_udp_ports)
+  open_tcp_ports = concat(["22", "655", "8000", "8301"], var.open_tcp_ports)
+  open_udp_ports = concat(["51820", "655", "8301"], var.open_udp_ports)
 }
 /* RESOURCES ------------------------------------*/
 
@@ -19,19 +19,19 @@ resource "digitalocean_tag" "host" {
 
 /* Optional resource when vol_size is set */
 resource "digitalocean_volume" "host" {
-  name      = "data-${replace(var.name, ".", "-")}-${format("%02d", count.index+1)}-${replace(local.sufix, ".", "-")}"
-  region    = var.region
-  size      = var.data_vol_size
-  count     = var.data_vol_size > 0 ? var.host_count : 0
+  name   = "data-${replace(var.name, ".", "-")}-${format("%02d", count.index + 1)}-${replace(local.sufix, ".", "-")}"
+  region = var.region
+  size   = var.data_vol_size
+  count  = var.data_vol_size > 0 ? var.host_count : 0
   lifecycle {
     prevent_destroy = true
     /* We do this to avoid destrying a volume unnecesarily */
-    ignore_changes = [ name ]
+    ignore_changes = [name]
   }
 }
 
 resource "digitalocean_droplet" "host" {
-  name   = "${var.name}-${format("%02d", count.index+1)}.${local.sufix}"
+  name = "${var.name}-${format("%02d", count.index + 1)}.${local.sufix}"
 
   image    = var.image
   region   = var.region
@@ -39,14 +39,14 @@ resource "digitalocean_droplet" "host" {
   count    = var.host_count
   ssh_keys = var.ssh_keys
 
-  tags   = digitalocean_tag.host[*].id
+  tags = digitalocean_tag.host[*].id
 
   /* This can be optional, ugly as hell but it works */
   volume_ids = var.data_vol_size > 0 ? [digitalocean_volume.host[count.index].id] : null
 
   /* Ignore changes in attributes like image */
   lifecycle {
-    ignore_changes = [ image ]
+    ignore_changes = [image]
   }
 
   /* bootstraping access for later Ansible use */
@@ -60,11 +60,11 @@ resource "digitalocean_droplet" "host" {
       groups = [var.group]
 
       extra_vars = {
-        hostname         = self.name
-        ansible_ssh_user = var.ssh_user
-        data_center      = local.dc
-        stage            = local.stage
-        env              = var.env
+        hostname     = self.name
+        ansible_user = var.ssh_user
+        data_center  = local.dc
+        stage        = local.stage
+        env          = var.env
       }
     }
   }
@@ -114,7 +114,7 @@ resource "digitalocean_firewall" "host" {
       source_addresses = ["0.0.0.0/0", "::/0"]
     }
   }
-  
+
   /* Open for all outgoing connections */
   dynamic "outbound_rule" {
     iterator = protocol

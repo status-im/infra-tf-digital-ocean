@@ -17,5 +17,5 @@ output "hosts" {
 }
 
 output "ids" {
-  value = zipmap(local.hostnames, local.droplet_ids )
+  value = zipmap(local.hostnames, local.droplet_ids)
 }
