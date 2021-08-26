@@ -6,9 +6,9 @@ locals {
   /* tags for the dropplet */
   tags        = [local.stage, var.group, var.env]
   tags_sorted = sort(distinct(local.tags))
-  /* always add SSH, Tinc, Netdata, and Consul to allowed ports */
-  open_tcp_ports = concat(["22", "655", "8000", "8301"], var.open_tcp_ports)
-  open_udp_ports = concat(["51820", "655", "8301"], var.open_udp_ports)
+  /* always add SSH, WireGuard, and Consul to allowed ports */
+  open_tcp_ports = concat(["22", "8301"], var.open_tcp_ports)
+  open_udp_ports = concat(["51820", "8301"], var.open_udp_ports)
 }
 /* RESOURCES ------------------------------------*/
 
