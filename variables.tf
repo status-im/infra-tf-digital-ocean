@@ -88,7 +88,6 @@ variable "ssh_keys" {
   type        = list(string)
   default = [
     "20671731", # jakubgs
-    "30058112", # arthurk
   ]
   /* cmd: doctl compute ssh-key list */
 }
