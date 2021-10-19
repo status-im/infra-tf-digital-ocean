@@ -16,7 +16,7 @@ variable "image" {
   /* cmd: doctl compute image list --public */
 }
 
-variable "size" {
+variable "type" {
   description = "Type of host to create."
   type        = string
   default     = "s-1vcpu-1gb"

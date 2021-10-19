@@ -35,7 +35,7 @@ resource "digitalocean_droplet" "host" {
 
   image    = var.image
   region   = var.region
-  size     = var.size
+  size     = var.type
   count    = var.host_count
   ssh_keys = var.ssh_keys
 

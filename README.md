@@ -18,7 +18,7 @@ module "digital-ocean" {
 * __Scaling__
   * `host_count` - Number of hosts to start in this region.
   * `image` - OS image used to create host. (default: `ubuntu-18-04-x64`)
-  * `size` - Type of host to create. (default: `s-1vcpu-1gb`)
+  * `type` - Type of host to create. (default: `s-1vcpu-1gb`)
   * `region` - Region in which the host will be created. (default: `ams3`)
   * `data_vol_size` - Size in GiB of an extra data volume to attach to the dropplet. (default: 0)
 * __General__
