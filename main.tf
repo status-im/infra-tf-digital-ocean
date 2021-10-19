@@ -46,7 +46,7 @@ resource "digitalocean_droplet" "host" {
 
   /* Ignore changes in attributes like image */
   lifecycle {
-    ignore_changes = [image]
+    ignore_changes = [image, ssh_keys]
   }
 
   /* bootstraping access for later Ansible use */
