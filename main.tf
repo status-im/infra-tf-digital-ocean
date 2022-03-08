@@ -16,16 +16,19 @@ locals {
 /* RESOURCES ------------------------------------*/
 
 resource "digitalocean_tag" "host" {
-  name  = local.tags_sorted[count.index]
-  count = length(local.tags_sorted)
+  for_each = toset(local.tags_sorted)
+
+  name  = each.key
 }
 
 /* Optional resource when vol_size is set */
 resource "digitalocean_volume" "host" {
-  name   = "data-${replace(local.hostnames[count.index], ".", "-")}"
+  for_each = toset([ for h in local.hostnames : h if var.data_vol_size > 0 ])
+
+  name   = "data-${replace(each.key, ".", "-")}"
   region = var.region
   size   = var.data_vol_size
-  count  = var.data_vol_size > 0 ? var.host_count : 0
+
   lifecycle {
     prevent_destroy = true
     /* We do this to avoid destrying a volume unnecesarily */
@@ -34,18 +37,18 @@ resource "digitalocean_volume" "host" {
 }
 
 resource "digitalocean_droplet" "host" {
-  name = local.hostnames[count.index]
+  for_each = toset(local.hostnames)
 
+  name     = each.key
   image    = var.image
   region   = var.region
   size     = var.type
-  count    = var.host_count
   ssh_keys = var.ssh_keys
 
-  tags = digitalocean_tag.host[*].id
+  tags = [for tag in digitalocean_tag.host : tag.id]
 
   /* This can be optional, ugly as hell but it works */
-  volume_ids = var.data_vol_size > 0 ? [digitalocean_volume.host[count.index].id] : null
+  volume_ids = var.data_vol_size > 0 ? [digitalocean_volume.host[each.key].id] : null
 
   /* Ignore changes in attributes like image */
   lifecycle {
@@ -54,17 +57,19 @@ resource "digitalocean_droplet" "host" {
 }
 
 resource "digitalocean_floating_ip" "host" {
-  droplet_id = digitalocean_droplet.host[count.index].id
-  region     = digitalocean_droplet.host[count.index].region
-  count      = var.host_count
+  for_each = digitalocean_droplet.host
+
+  droplet_id = each.value.id
+  region     = each.value.region
+
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
 resource "digitalocean_firewall" "host" {
   name        = "${var.name}.${local.dc}.${var.env}.${local.stage}"
-  droplet_ids = digitalocean_droplet.host[*].id
+  droplet_ids = [for name, droplet in digitalocean_droplet.host : droplet.id]
 
   /* Allow ICMP pings */
   inbound_rule {
@@ -111,7 +116,7 @@ resource "digitalocean_firewall" "host" {
 }
 
 resource "null_resource" "host" {
-  for_each = zipmap(local.hostnames, digitalocean_droplet.host)
+  for_each = digitalocean_droplet.host
 
   /* Trigger bootstrapping on host or public IP change. */
   triggers = {
@@ -134,7 +139,7 @@ resource "null_resource" "host" {
         file_path = "${path.cwd}/ansible/bootstrap.yml"
       }
 
-      hosts  = [each.value.ip_address]
+      hosts  = [each.value.ipv4_address]
       groups = [var.group]
 
       extra_vars = {
@@ -149,25 +154,27 @@ resource "null_resource" "host" {
 }
 
 resource "cloudflare_record" "host" {
+  for_each = digitalocean_droplet.host
+
   zone_id = var.cf_zone_id
-  count   = var.host_count
-  name    = digitalocean_droplet.host[count.index].name
-  value   = digitalocean_floating_ip.host[count.index].ip_address
+  name    = each.key
+  value   = digitalocean_floating_ip.host[each.key].ip_address
   type    = "A"
   ttl     = 3600
 }
 
 resource "ansible_host" "host" {
-  inventory_hostname = digitalocean_droplet.host[count.index].name
+  for_each = digitalocean_droplet.host
+
+  inventory_hostname = each.key
 
   groups = ["${var.env}.${local.stage}", var.group, local.dc]
-  count  = var.host_count
 
   vars = {
-    ansible_host = digitalocean_floating_ip.host[count.index].ip_address
-    hostname     = digitalocean_droplet.host[count.index].name
-    region       = digitalocean_droplet.host[count.index].region
-    dns_entry    = "${local.hostnames[count.index]}.${var.domain}"
+    ansible_host = digitalocean_floating_ip.host[each.key].ip_address
+    hostname     = each.key
+    region       = each.value.region
+    dns_entry    = "${each.key}.${var.domain}"
     dns_domain   = var.domain
     data_center  = local.dc
     stage        = local.stage

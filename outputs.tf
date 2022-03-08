@@ -1,6 +1,6 @@
 locals {
-  public_ips  = digitalocean_floating_ip.host[*].ip_address
-  droplet_ids = digitalocean_droplet.host[*].id
+  public_ips  = [for a in digitalocean_floating_ip.host : a.ip_address]
+  droplet_ids = [for d in digitalocean_droplet.host : d.id]
 }
 
 output "public_ips" {
