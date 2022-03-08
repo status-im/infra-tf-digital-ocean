@@ -1,6 +1,5 @@
 locals {
   public_ips  = digitalocean_floating_ip.host[*].ip_address
-  hostnames   = digitalocean_droplet.host[*].name
   droplet_ids = digitalocean_droplet.host[*].id
 }
 

@@ -2,13 +2,16 @@
 locals {
   stage = var.stage != "" ? var.stage : terraform.workspace
   dc    = "${var.provider_name}-${var.region}"
-  sufix = "${local.dc}.${var.env}.${local.stage}"
-  /* tags for the dropplet */
-  tags        = [local.stage, var.group, var.env]
-  tags_sorted = sort(distinct(local.tags))
   /* always add SSH, WireGuard, and Consul to allowed ports */
   open_tcp_ports = concat(["22", "8301"], var.open_tcp_ports)
   open_udp_ports = concat(["51820", "8301"], var.open_udp_ports)
+  /* tags for the dropplet */
+  tags        = [local.stage, var.group, var.env]
+  tags_sorted = sort(distinct(local.tags))
+  /* pre-generated list of hostnames */
+  hostnames = [for i in range(1, var.host_count + 1) :
+    "${var.name}-${format("%02d", i)}.${local.dc}.${var.env}.${local.stage}"
+  ]
 }
 /* RESOURCES ------------------------------------*/
 
@@ -19,7 +22,7 @@ resource "digitalocean_tag" "host" {
 
 /* Optional resource when vol_size is set */
 resource "digitalocean_volume" "host" {
-  name   = "data-${replace(var.name, ".", "-")}-${format("%02d", count.index + 1)}-${replace(local.sufix, ".", "-")}"
+  name   = "data-${replace(local.hostnames[count.index], ".", "-")}"
   region = var.region
   size   = var.data_vol_size
   count  = var.data_vol_size > 0 ? var.host_count : 0
@@ -31,7 +34,7 @@ resource "digitalocean_volume" "host" {
 }
 
 resource "digitalocean_droplet" "host" {
-  name = "${var.name}-${format("%02d", count.index + 1)}.${local.sufix}"
+  name = local.hostnames[count.index]
 
   image    = var.image
   region   = var.region
@@ -80,7 +83,7 @@ resource "digitalocean_floating_ip" "host" {
 }
 
 resource "digitalocean_firewall" "host" {
-  name        = "${var.name}.${local.sufix}"
+  name        = "${var.name}.${local.dc}.${var.env}.${local.stage}"
   droplet_ids = digitalocean_droplet.host[*].id
 
   /* Allow ICMP pings */
@@ -146,7 +149,7 @@ resource "ansible_host" "host" {
     ansible_host = digitalocean_floating_ip.host[count.index].ip_address
     hostname     = digitalocean_droplet.host[count.index].name
     region       = digitalocean_droplet.host[count.index].region
-    dns_entry    = "${digitalocean_droplet.host[count.index].name}.${var.domain}"
+    dns_entry    = "${local.hostnames[count.index]}.${var.domain}"
     dns_domain   = var.domain
     data_center  = local.dc
     stage        = local.stage
