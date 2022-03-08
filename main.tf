@@ -51,26 +51,6 @@ resource "digitalocean_droplet" "host" {
   lifecycle {
     ignore_changes = [image, ssh_keys]
   }
-
-  /* bootstraping access for later Ansible use */
-  provisioner "ansible" {
-    plays {
-      playbook {
-        file_path = "${path.cwd}/ansible/bootstrap.yml"
-      }
-
-      hosts  = [self.ipv4_address]
-      groups = [var.group]
-
-      extra_vars = {
-        hostname     = self.name
-        ansible_user = var.ssh_user
-        data_center  = local.dc
-        stage        = local.stage
-        env          = var.env
-      }
-    }
-  }
 }
 
 resource "digitalocean_floating_ip" "host" {
@@ -126,6 +106,44 @@ resource "digitalocean_firewall" "host" {
       protocol              = protocol.value
       port_range            = "all"
       destination_addresses = ["0.0.0.0/0", "::/0"]
+    }
+  }
+}
+
+resource "null_resource" "host" {
+  for_each = zipmap(local.hostnames, digitalocean_droplet.host)
+
+  /* Trigger bootstrapping on host or public IP change. */
+  triggers = {
+    droplet_id = each.value.id
+    #floatin_ip_id  = digitalocean_floating_ip.host[count.index].id
+  }
+
+  /* Make sure everything is in place before bootstrapping. */
+  depends_on = [
+    digitalocean_volume.host,
+    digitalocean_droplet.host,
+    digitalocean_floating_ip.host,
+    digitalocean_firewall.host,
+  ]
+
+  /* bootstraping access for later Ansible use */
+  provisioner "ansible" {
+    plays {
+      playbook {
+        file_path = "${path.cwd}/ansible/bootstrap.yml"
+      }
+
+      hosts  = [each.value.ip_address]
+      groups = [var.group]
+
+      extra_vars = {
+        hostname     = each.key
+        ansible_user = var.ssh_user
+        data_center  = local.dc
+        stage        = local.stage
+        env          = var.env
+      }
     }
   }
 }
