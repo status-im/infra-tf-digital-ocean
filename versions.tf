@@ -8,12 +8,11 @@ terraform {
     }
     cloudflare = {
       source  = "cloudflare/cloudflare"
-      version = "= 3.26.0"
-
+      version = "= 4.26.0"
     }
     ansible = {
       source  = "nbering/ansible"
-      version = " = 1.0.4"
+      version = "= 1.0.4"
     }
   }
 }
