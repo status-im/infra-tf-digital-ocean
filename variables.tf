@@ -90,6 +90,7 @@ variable "ssh_keys" {
     "20671731", # jakubgs
     "38154610", # alexis@status.im
     "39365941", # yakimant
+    "42672671", # siddarth
   ]
   /* cmd: doctl compute ssh-key list */
 }
