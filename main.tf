@@ -154,13 +154,23 @@ resource "null_resource" "host" {
   }
 }
 
-resource "cloudflare_record" "host" {
+resource "cloudflare_record" "host_ipv4" {
   for_each = digitalocean_droplet.host
 
   zone_id = var.cf_zone_id
   name    = each.key
   value   = digitalocean_floating_ip.host[each.key].ip_address
   type    = "A"
+  ttl     = 3600
+}
+
+resource "cloudflare_record" "host_ipv6" {
+  for_each = digitalocean_droplet.host
+
+  zone_id = var.cf_zone_id
+  name    = each.key
+  value   = digitalocean_droplet.host[each.key].ipv6_address
+  type    = "AAAA"
   ttl     = 3600
 }
 
