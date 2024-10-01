@@ -44,6 +44,7 @@ resource "digitalocean_droplet" "host" {
   region   = var.region
   size     = var.type
   ssh_keys = var.ssh_keys
+  ipv6     = true
 
   tags = [for tag in digitalocean_tag.host : tag.id]
 
