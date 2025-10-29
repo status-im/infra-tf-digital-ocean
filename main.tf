@@ -5,6 +5,26 @@ locals {
   /* always add SSH, WireGuard, and Consul to allowed ports */
   open_tcp_ports = concat(["22", "8301"], var.open_tcp_ports)
   open_udp_ports = concat(["51820", "8301"], var.open_udp_ports)
+
+  legacy_tcp_rules = [for port in local.open_tcp_ports : {
+    protocol = "tcp"
+    port     = port
+    sources  = ["0.0.0.0/0", "::/0"]
+  }]
+  
+  legacy_udp_rules = [for port in local.open_udp_ports : {
+    protocol = "udp"
+    port     = port
+    sources  = ["0.0.0.0/0", "::/0"]
+  }]
+  
+  # Merge legacy rules with new firewall_rules
+  all_firewall_rules = concat(
+    local.legacy_tcp_rules,
+    local.legacy_udp_rules,
+    var.firewall_rules
+  )
+
   /* tags for the dropplet */
   tags        = [local.stage, var.group, var.env]
   tags_sorted = sort(distinct(local.tags))
@@ -82,25 +102,13 @@ resource "digitalocean_firewall" "host" {
     destination_addresses = ["0.0.0.0/0", "::/0"]
   }
 
-  /* TCP */
+  # All firewall rules (default + legacy + custom)
   dynamic "inbound_rule" {
-    iterator = port
-    for_each = local.open_tcp_ports
+    for_each = local.all_firewall_rules
     content {
-      protocol         = "tcp"
-      port_range       = port.value
-      source_addresses = ["0.0.0.0/0", "::/0"]
-    }
-  }
-
-  /* UDP */
-  dynamic "inbound_rule" {
-    iterator = port
-    for_each = local.open_udp_ports
-    content {
-      protocol         = "udp"
-      port_range       = port.value
-      source_addresses = ["0.0.0.0/0", "::/0"]
+      protocol         = inbound_rule.value.protocol
+      port_range       = inbound_rule.value.port
+      source_addresses = inbound_rule.value.sources
     }
   }
 

@@ -109,3 +109,13 @@ variable "open_udp_ports" {
   type        = list(string)
   default     = []
 }
+
+variable "firewall_rules" {
+  description = "Firewall rules with optional source IP restrictions"
+  type = list(object({
+    protocol = string           # "tcp" or "udp"
+    port     = string           # Port number or range (e.g., "22" or "8000-8010")
+    sources  = optional(list(string), ["0.0.0.0/0", "::/0"])  # Defaults to all IPs
+  }))
+  default = []
+}
