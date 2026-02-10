@@ -89,7 +89,6 @@ variable "ssh_keys" {
   default = [
     "20671731", # jakubgs
     "38154610", # alexis@status.im
-    "39365941", # yakimant-gpg
     "51784987", # yakimant-sk-24553378
     "51785012", # yakimant-sk-24553389
     "42672671", # siddarth
