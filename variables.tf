@@ -17,7 +17,7 @@ variable "domain" {
 variable "image" {
   description = "OS image used to create host."
   type        = string
-  default     = "ubuntu-22-04-x64"
+  default     = "ubuntu-24-04-x64"
   /* cmd: doctl compute image list --public */
 }
 
